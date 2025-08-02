@@ -1,70 +1,77 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../models/product.dart';
 
 class ProductService {
-  static const baseUrl = 'http://10.0.2.2:8080/api/products';
+  static const baseUrl = 'http://localhost:8080/api/products';
 
-  // ✅ মূল মেথড
-  static Future<List<Product>> fetchProducts() async {
-    final resp = await http.get(Uri.parse(baseUrl));
-    if (resp.statusCode == 200) {
-      final data = jsonDecode(resp.body) as List;
-      return data.map((e) => Product.fromJson(e)).toList();
+  static Future<Product> createProductMobile(Product product, File imageFile) async {
+    final uri = Uri.parse(baseUrl);
+    final request = http.MultipartRequest('POST', uri);
+    request.fields['product'] = jsonEncode(product.toJson());
+
+    request.files.add(await http.MultipartFile.fromPath(
+      'image',
+      imageFile.path,
+      contentType: MediaType('image', 'jpeg'),
+    ));
+
+    // Optional: Set headers (Content-Type is automatically set for multipart)
+    // request.headers['Content-Type'] = 'multipart/form-data';
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+      return Product.fromJson(responseData);
+    } else {
+      throw Exception('Failed to create product: ${response.body}');
     }
-    throw Exception('Failed to load products');
   }
 
-  // ✅ alias method (সমাধানের জন্য)
-  static Future<List<Product>> getProducts() async {
-    return await fetchProducts();
-  }
+  //For Web
+  static Future<Product> createProductWeb(Product product, String fileName, Uint8List bytes) async {
+    final uri = Uri.parse(baseUrl);
+    final request = http.MultipartRequest('POST', uri);
+    request.fields['product'] = jsonEncode(product.toJson());
+    request.files.add(http.MultipartFile.fromBytes(
+      'image',
+      bytes,
+      filename: fileName,
+      contentType: MediaType('image', 'jpeg'),
+    ));
 
-  // ✅ নতুন প্রোডাক্ট তৈরি
-  static Future<Product> createProduct(Product product, File? imageFile) async {
-    final request = http.MultipartRequest('POST', Uri.parse(baseUrl));
-    request.fields['product'] = jsonEncode({
-      'name': product.name,
-      'description': product.description,
-      'price': product.price,
-      'stock': product.stock,
-      'discount': product.discount,
-      'category': product.categoryId != null ? {'id': product.categoryId} : null,
-      'subCategory': product.subCategoryId != null ? {'id': product.subCategoryId} : null,
-    });
-    if (imageFile != null) {
-      request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+      return Product.fromJson(responseData);
+    } else {
+      throw Exception('Failed to create product (web): ${response.body}');
     }
-    final streamed = await request.send();
-    final resp = await http.Response.fromStream(streamed);
-    if (resp.statusCode == 200) return Product.fromJson(jsonDecode(resp.body));
-    throw Exception('Create failed: ${resp.body}');
   }
 
-  // ✅ প্রোডাক্ট আপডেট
-  static Future<Product> updateProduct(int id, Product p) async {
-    final resp = await http.put(
-      Uri.parse('$baseUrl/$id'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'name': p.name,
-        'description': p.description,
-        'price': p.price,
-        'stock': p.stock,
-        'discount': p.discount,
-        'category': p.categoryId != null ? {'id': p.categoryId} : null,
-        'subCategory': p.subCategoryId != null ? {'id': p.subCategoryId} : null,
-        'pictureUrl': p.pictureUrl,
-      }),
-    );
-    if (resp.statusCode == 200) return Product.fromJson(jsonDecode(resp.body));
-    throw Exception('Update failed');
+  // Fetch All Products
+  static Future<List<Product>> getAllProducts() async {
+    final response = await http.get(Uri.parse(baseUrl));
+    if (response.statusCode == 200) {
+      final List jsonData = jsonDecode(response.body);
+      return jsonData.map((e) => Product.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to fetch products');
+    }
   }
 
-  // ✅ প্রোডাক্ট ডিলিট
+  // Delete Product
   static Future<void> deleteProduct(int id) async {
-    final resp = await http.delete(Uri.parse('$baseUrl/$id'));
-    if (resp.statusCode != 204) throw Exception('Delete failed');
+    final response = await http.delete(Uri.parse('$baseUrl/$id'));
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete product: ${response.body}');
+    }
   }
 }

@@ -27,7 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (user != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration successful!')));
-      Navigator.pop(context); // Go back to login
+      Navigator.pop(context); 
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed!')));
     }

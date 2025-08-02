@@ -1,5 +1,8 @@
 import 'package:e_market/screens/admin_dashboard_screen.dart';
+import 'package:e_market/screens/both_dashboard_screen.dart';
+import 'package:e_market/screens/buyer_dashboard_screen.dart';
 import 'package:e_market/screens/register_screen.dart';
+import 'package:e_market/screens/supplier_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
@@ -27,31 +30,49 @@ class _LoginScreenState extends State<LoginScreen> {
   final user = await ApiService.login(emailController.text, passwordController.text);
 
   if (user != null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Welcome ${user.fullName}')),
-    );
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Welcome ${user.fullName}')),
+  );
 
-    if (user.role == "ADMIN") {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => AdminDashboardScreen(user: user)),
-      );
-    } else {
-      // You can redirect to Buyer/Supplier dashboard instead if needed
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Unauthorized'),
-          content: Text('Access denied. Only admins can access this dashboard.'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text('OK')),
-          ],
-        ),
-      );
-    }
+  if (user.role == "ADMIN") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AdminDashboardScreen(user: user)),
+    );
+  } else if (user.role == "SUPPLIER") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => SupplierDashboardScreen(user: user)),
+    );
+  } else if (user.role == "BUYER") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => BuyerDashboardScreen(user: user)),
+    );
+  } else if (user.role == "BOTH") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => BothDashboardScreen(user: user)),
+    );
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
+    // Unknown role
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Unauthorized'),
+        content: Text('Access denied. Your role is not recognized.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('OK')),
+        ],
+      ),
+    );
   }
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Login failed')),
+  );
+}
+
 }
 
 

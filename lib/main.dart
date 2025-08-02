@@ -1,12 +1,12 @@
-
-
 import 'package:e_market/screens/add_category_screen.dart';
 import 'package:e_market/screens/add_product_screen.dart';
 import 'package:e_market/screens/add_subcategory_screen.dart';
 import 'package:e_market/screens/product_list_screen.dart';
 import 'package:e_market/screens/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; 
 import 'screens/login_screen.dart';
+import 'providers/product_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,27 +17,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'B2B E-Market',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-        textTheme: const TextTheme(
-          headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-          bodyLarge: TextStyle(fontSize: 18),
+    return ChangeNotifierProvider(
+      create: (_) => ProductProvider(),
+      child: MaterialApp(
+        title: 'B2B E-Market',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          useMaterial3: true,
+          textTheme: const TextTheme(
+            headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            bodyLarge: TextStyle(fontSize: 18),
+          ),
         ),
+        home: const LandingPage(),
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/add-category': (context) => const AddCategoryScreen(),
+          '/add-subcategory': (context) => const AddSubCategoryScreen(),
+          '/add-product': (context) => const AddProductScreen(),
+          '/product-list': (context) => const ProductListScreen(),
+      
+        },
       ),
-      home: const LandingPage(),
-routes: {
-  '/login': (context) => const LoginScreen(),
-  '/register': (context) => const RegisterScreen(),
-  '/add-category': (context) => const AddCategoryScreen(),
-  '/add-subcategory': (context) => const AddSubCategoryScreen(),
-  '/add-product': (context) => const AddProductScreen(),
-  '/product-list': (context) => const ProductListScreen(),
-},
-
     );
   }
 }
@@ -90,7 +93,7 @@ class LandingPage extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 onPressed: () {
-                  // Navigator.pushNamed(context, '/register');
+                  Navigator.pushNamed(context, '/register');
                 },
                 icon: const Icon(Icons.app_registration),
                 label: const Text('Register'),

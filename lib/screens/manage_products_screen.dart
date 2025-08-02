@@ -72,13 +72,13 @@ class _AddProductForm extends StatelessWidget {
   }
 }
 
-// 🟢 Dummy product list
+//product list
 class _ProductListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
-      itemCount: 5, // example product count
+      itemCount: 5, 
       separatorBuilder: (_, __) => const Divider(),
       itemBuilder: (context, index) {
         return ListTile(
@@ -88,7 +88,7 @@ class _ProductListView extends StatelessWidget {
           trailing: IconButton(
             icon: const Icon(Icons.edit, color: Colors.blue),
             onPressed: () {
-              // TODO: edit product
+             
             },
           ),
         );

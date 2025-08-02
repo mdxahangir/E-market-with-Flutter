@@ -43,4 +43,7 @@ class CategoryService {
       throw Exception('Failed to delete category');
     }
   }
+
+  // For loading categories list (alias)
+  static Future<List<Category>> getAllCategories() => fetchCategories();
 }
