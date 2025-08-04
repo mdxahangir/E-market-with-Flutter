@@ -1,9 +1,8 @@
-import 'package:e_market/screens/manage_products_screen.dart';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
-  final UserResponse user;
+  final User user;
 
   const AdminDashboardScreen({super.key, required this.user});
 

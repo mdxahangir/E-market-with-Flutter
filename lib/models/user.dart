@@ -1,16 +1,16 @@
-class UserResponse {
+class User {
   final String fullName;
   final String email;
   final String role;
 
-  UserResponse({
+  User({
     required this.fullName,
     required this.email,
     required this.role,
   });
 
-  factory UserResponse.fromJson(Map<String, dynamic> json) {
-    return UserResponse(
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
       fullName: json['fullName'],
       email: json['email'],
       role: json['role'],

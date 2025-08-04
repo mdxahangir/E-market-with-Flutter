@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 
 class SupplierDashboardScreen extends StatelessWidget {
-  final UserResponse user;
+  final User user;
 
   const SupplierDashboardScreen({super.key, required this.user});
 

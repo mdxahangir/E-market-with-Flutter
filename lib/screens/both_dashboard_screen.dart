@@ -4,7 +4,7 @@ import 'buyer_dashboard_screen.dart';
 import 'supplier_dashboard_screen.dart';
 
 class BothDashboardScreen extends StatefulWidget {
-  final UserResponse user;
+  final User user;
 
   const BothDashboardScreen({super.key, required this.user});
 

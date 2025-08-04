@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
           '/add-subcategory': (context) => const AddSubCategoryScreen(),
           '/add-product': (context) => const AddProductScreen(),
           '/product-list': (context) => const ProductListScreen(),
+          // '/product-detail': (context) => const ProductDetailScreen(),
       
         },
       ),

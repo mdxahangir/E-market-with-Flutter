@@ -5,7 +5,7 @@ import '../models/user.dart';
 class ApiService {
   static const baseUrl = 'http://localhost:8080/api/users';
 
-  static Future<UserResponse?> register({
+  static Future<User?> register({
     required String fullName,
     required String email,
     required String password,
@@ -27,14 +27,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return UserResponse.fromJson(jsonDecode(response.body));
+      return User.fromJson(jsonDecode(response.body));
     } else {
       print('Registration failed: ${response.body}');
       return null;
     }
   }
 
-  static Future<UserResponse?> login(String email, String password) async {
+  static Future<User?> login(String email, String password) async {
     final url = Uri.parse('$baseUrl/login');
 
     final response = await http.post(
@@ -47,7 +47,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return UserResponse.fromJson(jsonDecode(response.body));
+      return User.fromJson(jsonDecode(response.body));
     } else {
       print('Login failed: ${response.body}');
       return null;
