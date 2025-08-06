@@ -1,4 +1,5 @@
 
+import 'package:e_market/screens/process_to_checkout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
@@ -144,21 +145,40 @@ class _CartSummaryScreenState extends State<CartSummaryScreen> {
                 ),
 
                 // Checkout Button
+                // Padding(
+                //   padding: const EdgeInsets.all(16),
+                //   child: SizedBox(
+                //     width: double.infinity,
+                //     child: ElevatedButton.icon(
+                //       onPressed: () {
+                //         ScaffoldMessenger.of(context).showSnackBar(
+                //           const SnackBar(content: Text("Proceeding to checkout...")),
+                //         );
+                //       },
+                //       icon: const Icon(Icons.shopping_cart_checkout),
+                //       label: const Text("Checkout"),
+                //     ),
+                //   ),
+                // ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Proceeding to checkout...")),
-                        );
-                      },
-                      icon: const Icon(Icons.shopping_cart_checkout),
-                      label: const Text("Checkout"),
-                    ),
-                  ),
-                ),
+  padding: const EdgeInsets.all(16),
+  child: SizedBox(
+    width: double.infinity,
+    child: ElevatedButton.icon(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProcessToCheckoutScreen(grandTotal: cartProvider.grandTotal),
+          ),
+        );
+      },
+      icon: const Icon(Icons.shopping_cart_checkout),
+      label: const Text("Checkout"),
+    ),
+  ),
+),
+
               ],
             ),
     );
