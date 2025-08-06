@@ -1,6 +1,9 @@
+import 'package:e_market/providers/cart_provider.dart';
 import 'package:e_market/screens/add_category_screen.dart';
 import 'package:e_market/screens/add_product_screen.dart';
 import 'package:e_market/screens/add_subcategory_screen.dart';
+import 'package:e_market/screens/cart_summary_screen.dart';
+import 'package:e_market/screens/product_detail_screen.dart';
 import 'package:e_market/screens/product_list_screen.dart';
 import 'package:e_market/screens/register_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +20,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProductProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()), // ✅ এটিই যোগ করুন
+      ],
       child: MaterialApp(
         title: 'B2B E-Market',
         debugShowCheckedModeBanner: false,
@@ -38,13 +44,54 @@ class MyApp extends StatelessWidget {
           '/add-subcategory': (context) => const AddSubCategoryScreen(),
           '/add-product': (context) => const AddProductScreen(),
           '/product-list': (context) => const ProductListScreen(),
-          // '/product-detail': (context) => const ProductDetailScreen(),
-      
+          //'/product-detail': (context) => const ProductDetailScreen(),
+          '/cart': (context) => const CartSummaryScreen(),
+
         },
       ),
     );
   }
 }
+
+// void main() {
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ChangeNotifierProvider(
+//       create: (_) => ProductProvider(),
+//       child: MaterialApp(
+//         title: 'B2B E-Market',
+//         debugShowCheckedModeBanner: false,
+//         theme: ThemeData(
+//           colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+//           useMaterial3: true,
+//           textTheme: const TextTheme(
+//             headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+//             bodyLarge: TextStyle(fontSize: 18),
+//           ),
+//         ),
+//         home: const LandingPage(),
+//         routes: {
+//           '/login': (context) => const LoginScreen(),
+//           '/register': (context) => const RegisterScreen(),
+//           '/add-category': (context) => const AddCategoryScreen(),
+//           '/add-subcategory': (context) => const AddSubCategoryScreen(),
+//           '/add-product': (context) => const AddProductScreen(),
+//           '/product-list': (context) => const ProductListScreen(),
+//           //'/product-detail': (context) => const ProductDetailScreen(),
+//           '/cart': (context) => const CartScreen(),
+//           '/checkout': (context) => const CheckoutScreen(),
+      
+//         },
+//       ),
+//     );
+//   }
+// }
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});

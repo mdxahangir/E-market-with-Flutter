@@ -611,6 +611,11 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                 title: const Text('My Wishlist'),
                 onTap: () => Navigator.pushNamed(context, '/wishlist'),
               ),
+               ListTile(
+                leading: const Icon(Icons.favorite),
+                title: const Text('Cart Items'),
+                onTap: () => Navigator.pushNamed(context, '/cart'),
+              ),
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Profile Settings'),
