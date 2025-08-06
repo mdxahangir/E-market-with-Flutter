@@ -1,3 +1,41 @@
+
+// import 'package:flutter/material.dart';
+// import '../models/cart_item.dart';
+// import '../models/product.dart';
+
+// class CartProvider with ChangeNotifier {
+//   final Map<int, CartItem> _items = {};
+
+//   Map<int, CartItem> get items => _items;
+
+//   int get totalItems =>
+//       _items.values.fold(0, (sum, item) => sum + item.quantity);
+
+//   double get totalPrice {
+//     return _items.values
+//         .map((item) => item.totalPrice)
+//         .fold(0.0, (prev, price) => prev + price);
+//   }
+
+//   void addToCart(Product product, int quantity) {
+//     if (_items.containsKey(product.id)) {
+//       _items[product.id!]!.quantity += quantity;
+//     } else {
+//       _items[product.id!] = CartItem(product: product, quantity: quantity);
+//     }
+//     notifyListeners();
+//   }
+
+//   void removeFromCart(int productId) {
+//     _items.remove(productId);
+//     notifyListeners();
+//   }
+
+//   void clearCart() {
+//     _items.clear();
+//     notifyListeners();
+//   }
+// }
 import 'package:flutter/material.dart';
 import '../models/cart_item.dart';
 import '../models/product.dart';
@@ -7,13 +45,19 @@ class CartProvider with ChangeNotifier {
 
   Map<int, CartItem> get items => _items;
 
-  int get totalItems => _items.length;
+  int get totalItems => _items.values.fold(0, (sum, item) => sum + item.quantity);
 
-  double get totalPrice {
-    return _items.values
-        .map((item) => item.totalPrice)
-        .fold(0.0, (prev, price) => prev + price);
+  double get subtotal {
+    return _items.values.fold(0.0, (sum, item) => sum + item.totalPrice);
   }
+
+  double vatRate = 0.15; // 15% VAT, you can adjust dynamically
+
+  double shippingCost = 0.0;
+
+  double get vat => subtotal * vatRate;
+
+  double get grandTotal => subtotal + vat + shippingCost;
 
   void addToCart(int productId, int quantity, {Product? product}) {
     if (_items.containsKey(productId)) {
@@ -26,6 +70,24 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void incrementQuantity(int productId) {
+    if (_items.containsKey(productId)) {
+      _items[productId]!.quantity++;
+      notifyListeners();
+    }
+  }
+
+  void decrementQuantity(int productId) {
+    if (_items.containsKey(productId)) {
+      if (_items[productId]!.quantity > 1) {
+        _items[productId]!.quantity--;
+      } else {
+        _items.remove(productId);
+      }
+      notifyListeners();
+    }
+  }
+
   void removeFromCart(int productId) {
     _items.remove(productId);
     notifyListeners();
@@ -33,6 +95,11 @@ class CartProvider with ChangeNotifier {
 
   void clearCart() {
     _items.clear();
+    notifyListeners();
+  }
+
+  void setShippingCost(double cost) {
+    shippingCost = cost;
     notifyListeners();
   }
 }

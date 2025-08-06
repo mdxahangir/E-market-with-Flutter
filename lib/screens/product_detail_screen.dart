@@ -167,77 +167,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-// Row(
-//   children: [
-//     Expanded(
-//       child: ElevatedButton.icon(
-//         icon: const Icon(Icons.add_shopping_cart),
-//         label: const Text("Add to Cart"),
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: Colors.orange,
-//         ),
-//         onPressed: () {
-//           // TODO: Add to cart logic & navigate to cart page
-//           Navigator.pushNamed(context, '/cart', arguments: widget.product);
-//         },
-//       ),
-//     ),
-//     const SizedBox(width: 16),
-//     Expanded(
-//       child: ElevatedButton.icon(
-//         icon: const Icon(Icons.shopping_bag),
-//         label: const Text("Buy Now"),
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: Colors.green,
-//         ),
-//         onPressed: () {
-//           // TODO: Direct checkout
-//           Navigator.pushNamed(context, '/checkout', arguments: widget.product);
-//         },
-//       ),
-//     ),
-//   ],
-// ),
-// Inside ProductDetailScreen
-Row(
-  children: [
-    Expanded(
-      child: ElevatedButton.icon(
-        icon: const Icon(Icons.add_shopping_cart),
-        label: const Text("Add to Cart"),
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-        onPressed: () {
-          Provider.of<CartProvider>(context, listen: false)
-              .addToCart(widget.product.id!, 1, product: widget.product);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Added to cart')),
-          );
-        },
-      ),
-    ),
-    const SizedBox(width: 16),
-    Expanded(
-      child: ElevatedButton.icon(
-        icon: const Icon(Icons.shopping_bag),
-        label: const Text("Buy Now"),
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-        onPressed: () {
-          Provider.of<CartProvider>(context, listen: false)
-              .addToCart(widget.product.id!, 1, product: widget.product);
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.add_shopping_cart),
+                          label: const Text("Add to Cart"),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                          onPressed: () {
+                            Provider.of<CartProvider>(context, listen: false)
+                                .addToCart(widget.product.id!, 1, product: widget.product);
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CartSummaryScreen(),
-            ),
-          );
-        },
-      ),
-    ),
-  ],
-)
-,
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Added to cart')),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.shopping_bag),
+                          label: const Text("Buy Now"),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                          onPressed: () {
+                            Provider.of<CartProvider>(context, listen: false)
+                                .addToCart(widget.product.id!, 1, product: widget.product);
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CartSummaryScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
 
                   const Divider(height: 32),
                   Text("Created By: ${product.createdByName ?? "N/A"} (${product.createdByCode ?? "N/A"})"),
