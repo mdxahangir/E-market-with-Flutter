@@ -1,7 +1,8 @@
-
 import 'package:e_market/screens/process_to_checkout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/shipping_method.dart';
+import '../services/shipping_method_service.dart';
 import '../providers/cart_provider.dart';
 
 class CartSummaryScreen extends StatefulWidget {
@@ -12,24 +13,114 @@ class CartSummaryScreen extends StatefulWidget {
 }
 
 class _CartSummaryScreenState extends State<CartSummaryScreen> {
-  // Example shipping options; replace with real data / API later
-  final List<Map<String, dynamic>> shippingOptions = [
-    {'name': 'Standard Shipping ', 'cost': 50.0},
-    {'name': 'Express Shipping', 'cost': 120.0},
-    {'name': 'Next-Day Delivery', 'cost': 200.0},
-  ];
+  List<ShippingMethod> shippingOptions = [];
+  ShippingMethod? selectedShipping;
+  bool isLoadingShipping = true;
 
-  String? selectedShipping;
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _costController = TextEditingController();
+  final _providerController = TextEditingController();
+  final _deliveryDaysController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    selectedShipping = shippingOptions.first['name'];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Set default shipping cost in provider
-      final provider = Provider.of<CartProvider>(context, listen: false);
-      provider.setShippingCost(shippingOptions.first['cost']);
-    });
+    _loadShippingMethods();
+  }
+
+  Future<void> _loadShippingMethods() async {
+    try {
+      final options = await ShippingMethodService.fetchShippingMethods();
+      setState(() {
+        shippingOptions = options;
+        if (options.isNotEmpty) {
+          selectedShipping = options.first;
+          Provider.of<CartProvider>(context, listen: false)
+              .setShippingCost(selectedShipping!.cost);
+        }
+        isLoadingShipping = false;
+      });
+    } catch (e) {
+      print('Error loading shipping methods: $e');
+      setState(() => isLoadingShipping = false);
+    }
+  }
+
+  Future<void> _addShippingMethod() async {
+    try {
+      final newMethod = ShippingMethod(
+        name: _nameController.text,
+        description: _descriptionController.text,
+        cost: double.tryParse(_costController.text) ?? 0.0,
+        provider: _providerController.text,
+        estimatedDeliveryDays: int.tryParse(_deliveryDaysController.text) ?? 3,
+        isActive: true,
+      );
+
+      final created =
+          await ShippingMethodService().createShippingMethod(newMethod);
+
+      setState(() {
+        shippingOptions.add(created);
+        if (selectedShipping == null) {
+          selectedShipping = created;
+          Provider.of<CartProvider>(context, listen: false)
+              .setShippingCost(created.cost);
+        }
+      });
+
+      Navigator.pop(context);
+    } catch (e) {
+      print("Error adding shipping method: $e");
+    }
+  }
+
+  void _showAddShippingDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Add Shipping Method"),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: "Name"),
+              ),
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: "Description"),
+              ),
+              TextField(
+                controller: _costController,
+                decoration: const InputDecoration(labelText: "Cost"),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: _providerController,
+                decoration: const InputDecoration(labelText: "Provider"),
+              ),
+              TextField(
+                controller: _deliveryDaysController,
+                decoration: const InputDecoration(labelText: "Estimated Delivery Days"),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: _addShippingMethod,
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -39,7 +130,15 @@ class _CartSummaryScreenState extends State<CartSummaryScreen> {
     final cartKeys = cartProvider.items.keys.toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Cart Summary")),
+      appBar: AppBar(
+        title: const Text("Cart Summary"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.local_shipping),
+            onPressed: _showAddShippingDialog,
+          )
+        ],
+      ),
       body: cartItems.isEmpty
           ? const Center(child: Text("Your cart is empty."))
           : Column(
@@ -110,21 +209,29 @@ class _CartSummaryScreenState extends State<CartSummaryScreen> {
                     children: [
                       const Text("Shipping Method: "),
                       const SizedBox(width: 10),
-                      DropdownButton<String>(
-                        value: selectedShipping,
-                        items: shippingOptions
-                            .map((option) => DropdownMenuItem<String>(
-                                  value: option['name'],
-                                  child: Text("${option['name']} (৳${option['cost']})"),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedShipping = value;
-                            final selectedOption = shippingOptions.firstWhere((option) => option['name'] == value);
-                            cartProvider.setShippingCost(selectedOption['cost']);
-                          });
-                        },
+                      Expanded(
+                        child: isLoadingShipping
+                            ? const Text("Loading shipping methods...")
+                            : DropdownButton<ShippingMethod>(
+                                value: selectedShipping,
+                                isExpanded: true,
+                                items: shippingOptions
+                                    .map(
+                                      (option) => DropdownMenuItem<ShippingMethod>(
+                                        value: option,
+                                        child: Text("${option.name} (৳${option.cost})"),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      selectedShipping = value;
+                                    });
+                                    cartProvider.setShippingCost(value.cost);
+                                  }
+                                },
+                              ),
                       ),
                     ],
                   ),
@@ -145,40 +252,38 @@ class _CartSummaryScreenState extends State<CartSummaryScreen> {
                 ),
 
                 // Checkout Button
-                // Padding(
-                //   padding: const EdgeInsets.all(16),
-                //   child: SizedBox(
-                //     width: double.infinity,
-                //     child: ElevatedButton.icon(
-                //       onPressed: () {
-                //         ScaffoldMessenger.of(context).showSnackBar(
-                //           const SnackBar(content: Text("Proceeding to checkout...")),
-                //         );
-                //       },
-                //       icon: const Icon(Icons.shopping_cart_checkout),
-                //       label: const Text("Checkout"),
-                //     ),
-                //   ),
-                // ),
                 Padding(
-  padding: const EdgeInsets.all(16),
-  child: SizedBox(
-    width: double.infinity,
-    child: ElevatedButton.icon(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProcessToCheckoutScreen(grandTotal: cartProvider.grandTotal),
-          ),
-        );
-      },
-      icon: const Icon(Icons.shopping_cart_checkout),
-      label: const Text("Checkout"),
-    ),
-  ),
-),
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (cartItems.isNotEmpty && selectedShipping != null) {
+                          final firstProductId = cartKeys.first;
+                          final firstItem = cartItems.first;
 
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProcessToCheckoutScreen(
+                                grandTotal: cartProvider.grandTotal,
+                                productId: firstProductId,
+                                productName: firstItem.product.name,
+                                productQuantity: firstItem.quantity,
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select a shipping method")),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.shopping_cart_checkout),
+                      label: const Text("Checkout"),
+                    ),
+                  ),
+                ),
               ],
             ),
     );

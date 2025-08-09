@@ -72,6 +72,10 @@ class AdminDashboardScreen extends StatelessWidget {
                   title: const Text("Product List"),
                   onTap: () => Navigator.pushNamed(context, '/product-list'),
                 ),
+                 ListTile(
+                  title: const Text("Add Shippling Method"),
+                  onTap: () => Navigator.pushNamed(context, '/shippling-method'),
+                ),
               ],
             ),
 

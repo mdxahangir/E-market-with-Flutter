@@ -16,16 +16,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
-  // void handleLogin() async {
-  //   final user = await ApiService.login(emailController.text, passwordController.text);
-
-  //   if (user != null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Welcome ${user.fullName}')));
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
-  //   }
-  // }
   void handleLogin() async {
   final user = await ApiService.login(emailController.text, passwordController.text);
 
