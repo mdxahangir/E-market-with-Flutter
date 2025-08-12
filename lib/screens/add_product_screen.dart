@@ -14,36 +14,28 @@ import '../services/category_service.dart';   // We'll create this service to fe
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
-
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
 }
-
 class _AddProductScreenState extends State<AddProductScreen> {
   final _formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
-
   String name = '';
   String description = '';
   double price = 0;
   int stock = 0;
   int discount = 0;
-
   XFile? pickedImage;
   Uint8List? webImageBytes;
-
   List<Category> categories = [];
   List<SubCategory> subCategories = [];
-
   Category? selectedCategory;
   SubCategory? selectedSubCategory;
-
   @override
   void initState() {
     super.initState();
     loadCategories();
   }
-
   Future<void> loadCategories() async {
     try {
       final fetchedCategories = await CategoryService.getAllCategories();
@@ -55,7 +47,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       print('Failed to load categories: $e');
     }
   }
-
   Future<void> loadSubCategories(int categoryId) async {
     try {
       final fetchedSubCategories =
@@ -68,7 +59,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       print('Failed to load subcategories: $e');
     }
   }
-
   Future<void> pickImage() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -83,33 +73,27 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
     }
   }
-
   Future<void> saveProduct() async {
     if (!_formKey.currentState!.validate()) return;
-
     if (pickedImage == null || (kIsWeb && webImageBytes == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select an image')),
       );
       return;
     }
-
     if (selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a category')),
       );
       return;
     }
-
     if (selectedSubCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a subcategory')),
       );
       return;
     }
-
     _formKey.currentState!.save();
-
 final product = Product(
   name: name,
   description: description,
@@ -119,10 +103,8 @@ final product = Product(
   categoryId: selectedCategory!.id,
   subCategoryId: selectedSubCategory!.id,
 );
-
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
-
     try {
       if (kIsWeb) {
         await productProvider.addProductWeb(
@@ -133,7 +115,6 @@ final product = Product(
       } else {
         await productProvider.addProductMobile(product, pickedImage!);
       }
-
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -141,7 +122,6 @@ final product = Product(
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,13 +139,11 @@ final product = Product(
                 validator: (val) =>
                     val == null || val.isEmpty ? 'Required' : null,
               ),
-
               // Description
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Description'),
                 onSaved: (val) => description = val ?? '',
               ),
-
               // Price
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Price'),
@@ -173,23 +151,19 @@ final product = Product(
                 onSaved: (val) =>
                     price = double.tryParse(val ?? '0') ?? 0.0,
               ),
-
               // Stock
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Stock'),
                 keyboardType: TextInputType.number,
                 onSaved: (val) => stock = int.tryParse(val ?? '0') ?? 0,
               ),
-
               // Discount
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Discount'),
                 keyboardType: TextInputType.number,
                 onSaved: (val) => discount = int.tryParse(val ?? '0') ?? 0,
               ),
-
               const SizedBox(height: 20),
-
               // Category Dropdown
               DropdownButtonFormField<Category>(
                 decoration: const InputDecoration(labelText: 'Category'),
@@ -215,9 +189,7 @@ final product = Product(
                 validator: (val) =>
                     val == null ? 'Please select a category' : null,
               ),
-
               const SizedBox(height: 10),
-
               // SubCategory Dropdown
               DropdownButtonFormField<SubCategory>(
                 decoration: const InputDecoration(labelText: 'SubCategory'),
@@ -238,25 +210,19 @@ final product = Product(
                 validator: (val) =>
                     val == null ? 'Please select a subcategory' : null,
               ),
-
               const SizedBox(height: 20),
-
               // Image Preview
               pickedImage != null
                   ? kIsWeb
                       ? Image.memory(webImageBytes!, height: 150)
                       : Image.file(File(pickedImage!.path), height: 150)
                   : const Text('No Image Selected'),
-
               const SizedBox(height: 10),
-
               ElevatedButton(
                 onPressed: pickImage,
                 child: const Text('Choose Image'),
               ),
-
               const SizedBox(height: 20),
-
               ElevatedButton(
                 onPressed: saveProduct,
                 child: const Text('Save Product'),

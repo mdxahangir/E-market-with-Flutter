@@ -3,6 +3,7 @@ import 'package:e_market/screens/add_category_screen.dart';
 import 'package:e_market/screens/add_product_screen.dart';
 import 'package:e_market/screens/add_subcategory_screen.dart';
 import 'package:e_market/screens/cart_summary_screen.dart';
+import 'package:e_market/screens/order_list.dart';
 import 'package:e_market/screens/product_detail_screen.dart';
 import 'package:e_market/screens/product_list_screen.dart';
 import 'package:e_market/screens/register_screen.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
           '/product-list': (context) => const ProductListScreen(),
           '/cart': (context) => const CartSummaryScreen(),
           '/shippling-method': (context) => const ShippingFormPage(),
+          '/order-list': (context) => const OrderListScreen(),
 
         },
       ),
